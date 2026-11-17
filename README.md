@@ -1,94 +1,67 @@
-# Lacakes Doceria 🍰
+# Lacakes Doceria — React + TypeScript + Supabase
 
-Catálogo simples de doces, inspirado na organização visual da Sweet Olivia, com as cores e o logo da Lacakes.
+Catálogo público e painel administrativo simples, com **apenas duas tabelas**:
+`produtos` e `categorias`. Sem backend Node/Express.
 
-## O que o site faz?
+## Configurar o Supabase (passo a passo)
 
-- Mostra o logo, informações da loja e cards de produtos.
-- Filtra produtos por categoria.
-- Pesquisa pelo nome do produto.
-- Exibe preço ou "Sob consulta".
-- Abre uma mensagem pronta no WhatsApp **quando o número da loja estiver configurado**.
-- Funciona em celulares e computadores.
+1. Entre em https://supabase.com/dashboard e crie um projeto no plano Free.
+2. Aguarde o projeto ficar pronto.
+3. Em **Authentication > Users**, crie um usuário administrador com e-mail e senha (Add user). Copie o **User UID (UUID)**. Evite deixar cadastro público habilitado sem necessidade.
+4. Abra `supabase/schema.sql` no repositório. Copie tudo para **SQL Editor** no painel do Supabase. **Antes de executar**, substitua o UUID `00000000-0000-0000-0000-000000000000` pelo UID copiado na etapa 3. Execute o SQL. Ele cria as duas tabelas com políticas de segurança RLS.
+5. Opcionalmente, execute `supabase/exemplos.sql` para inserir quatro categorias. Os produtos serão cadastrados pelo painel.
+6. Em **Project Settings > API Keys** (ou **Connect**), copie a **Project URL** e a **publishable key** (`sb_publishable_...`). A chave antiga `anon` também funciona. **NUNCA use `service_role` ou secret key no frontend.**
+7. Na raiz do projeto, crie `.env.local` (você pode copiar `.env.example`) e preencha:
 
-Não há login, banco de dados, painel administrativo ou carrinho nesta versão.
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_sua_chave
+```
 
-## Como executar
+8. Rode `npm install` e `npm run dev`. Abra `http://localhost:5173/admin`, faça login com o usuário do passo 3, cadastre categorias e produtos.
+9. Abra `http://localhost:5173/` e veja os produtos que você cadastrou. Recarregue a página após alterar o banco.
 
-1. Instale o Node.js.
-2. Abra o terminal na pasta do projeto.
-3. Execute:
+**Importante:** sem as variáveis do Supabase, a loja mostra dados ilustrativos locais e a área /admin avisa que falta configurar. Com variáveis preenchidas, o site usa exclusivamente os dados do banco — não usa mais os produtos de exemplo.
 
-~~~bash
-npm install
-npm run dev
-~~~
+## Funcionalidades
 
-Abra o endereço mostrado no terminal (normalmente http://localhost:5173).
+- Loja: listagem, busca e filtro por categorias.
+- Admin: login, cadastro, edição e exclusão de produtos.
+- Admin: criar, renomear e excluir categorias.
+- Fotos: neste primeiro momento basta **colar a URL pública de uma imagem** no formulário; ainda não existe upload de arquivos.
+- A exclusão de categoria com produtos vinculados é bloqueada no banco.
+- O WhatsApp é configurado separadamente em `src/data/loja.ts`; o número atual é fictício.
 
-Para testar a compilação:
+## Estrutura
 
-~~~bash
-npm run build
-~~~
-
-## Estrutura do projeto
-
-~~~text
-public/
-  logo.jpg                 Logo original da Lacakes
+```text
 src/
-  components/
-    Cabecalho.tsx          Logo, informações e faixa superior
-    Filtros.tsx            Botões de categoria e campo de busca
-    CardProduto.tsx        Visual de cada produto e botão de pedido
-  data/
-    loja.ts                Configurações da loja e WhatsApp
-    produtos.ts            Lista de produtos (dados de exemplo)
-  types/
-    produto.ts             Tipos do TypeScript
-  utils/
-    formatarPreco.ts       Converte números em reais
-    whatsapp.ts            Cria o link do WhatsApp
-  App.tsx                  Liga busca, filtros e a tela
-  main.tsx                 Inicializa o React
-  styles.css               Estilo visual e responsividade
-~~~
+  components/   Cabecalho, Filtros e CardProduto
+  data/         Configurações da loja e dados ilustrativos locais
+  hooks/        useCatalogo — busca e atualização do catálogo
+  lib/          supabase.ts — cliente Supabase
+  pages/        Admin.tsx — formulário e gerenciamento
+  services/     catalogo.ts — operações no banco
+  types/        produto.ts — tipos TypeScript
+  utils/        Formatação de preço e link WhatsApp
+  App.tsx       Página pública ou admin
+  styles.css    Layout e responsividade
+supabase/
+  schema.sql    Duas tabelas e regras RLS
+  exemplos.sql  Categorias iniciais (opcional)
+```
 
-## Primeiro, personalize estes arquivos
+## Entendendo o fluxo
 
-**1. src/data/loja.ts:** preencha o número REAL de WhatsApp com código do país e DDD, apenas números (55 + DDD + número). O botão de pedido só aparece depois disso. Preencha o Instagram caso exista.
+1. `lib/supabase.ts` cria a conexão usando as variáveis VITE_.
+2. `services/catalogo.ts` consulta duas tabelas e faz INSERT / UPDATE / DELETE.
+3. `hooks/useCatalogo.ts` usa `useEffect` para carregar os dados e `useState` para guardá-los.
+4. `App.tsx` filtra o array de produtos por texto e categoria e monta cards com `map`.
+5. `pages/Admin.tsx` guarda campos do formulário em `useState`, chama o serviço e recarrega os produtos após salvar.
+6. O banco verifica se o usuário logado possui o UUID autorizado em `public.lacakes_admin()`. Não basta apenas saber a rota `/admin`.
 
-**2. src/data/produtos.ts:** substitua as imagens de exemplo por fotos reais e confira preços, categorias e descrições. Os produtos de Natal usam valores exibidos na referência; os outros são **apenas exemplos ilustrativos**, não um cardápio confirmado. O preço pode ser null para exibir "Sob consulta".
+## Segurança
 
-**3. public/logo.jpg:** logo enviado com o repositório.
+Nunca coloque chaves secretas nem senha no GitHub. O navegador usa somente a chave pública e as políticas RLS impedem alterações de usuários não autorizados. Mantenha `.env.local` fora do Git.
 
-**4. src/styles.css:** altere as variáveis --azul, --azul-escuro e --creme para mudar a paleta.
-
-## Entendendo a lógica: por onde estudar?
-
-1. **data/produtos.ts:** veja que os itens estão em um array de objetos.
-2. **types/produto.ts:** entenda o formato de cada objeto.
-3. **App.tsx:** acompanhe o useState da categoria e da busca.
-4. **App.tsx:** observe o filter: ele só mantém itens que correspondem à categoria **e** ao nome digitado.
-5. **Filtros.tsx:** ao clicar numa categoria ou digitar, o componente chama funções recebidas por props; elas atualizam os estados no App.
-6. **CardProduto.tsx:** map cria um card para cada produto filtrado.
-7. **utils/whatsapp.ts:** encodeURIComponent prepara a mensagem para o link wa.me.
-
-### Exemplo de filtro
-
-~~~tsx
-const [busca, setBusca] = useState("");
-
-const encontrados = produtos.filter((produto) =>
-  produto.nome.toLowerCase().includes(busca.toLowerCase())
-);
-~~~
-
-Quando setBusca recebe um novo texto, o React renderiza a tela novamente e calcula a lista filtrada.
-
-## Observações
-
-- Os links de imagens são externos e temporários; use fotos próprias da doceria antes de publicar.
-- A campanha de Natal é uma referência visual, não uma confirmação de disponibilidade.
-- Para publicar, configure uma hospedagem estática como Vercel ou Netlify.
+O usuário do Auth não é uma terceira tabela do catálogo: a infraestrutura de login é gerenciada pelo Supabase.

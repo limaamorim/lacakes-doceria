@@ -1,12 +1,13 @@
-// Define o formato que todos os produtos precisam seguir.
-export type Categoria = "Natal" | "Copos da Felicidade" | "Cookies" | "Outros doces";
-
+// Categorias não são fixas: podem ser criadas e renomeadas no painel.
+export type Categoria = { id: number; nome: string };
 export type Produto = {
   id: number;
   nome: string;
-  categoria: Categoria;
+  categoria: string;
+  categoriaId: number;
   descricao: string;
-  preco: number | null; // null = preço ainda não informado
+  preco: number | null;
   imagem: string;
   destaque?: boolean;
 };
+export type ProdutoForm = Omit<Produto, "id" | "categoria">;

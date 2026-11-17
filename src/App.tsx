@@ -3,10 +3,17 @@ import { Heart, Sparkles } from "lucide-react";
 import { Cabecalho } from "./components/Cabecalho";
 import { Filtros } from "./components/Filtros";
 import { CardProduto } from "./components/CardProduto";
-import { produtos } from "./data/produtos";
+import { useCatalogo } from "./hooks/useCatalogo";
+import { Admin } from "./pages/Admin";
 import { loja } from "./data/loja";
 
 export default function App() {
+  if (window.location.pathname.replace(/\/$/, "") === "/admin") return <Admin />;
+  return <Loja />;
+}
+
+function Loja() {
+  const { produtos, categorias, carregando, erro } = useCatalogo();
   // useState guarda o filtro selecionado e o texto digitado na busca.
   const [categoria, setCategoria] = useState("Todos");
   const [busca, setBusca] = useState("");
@@ -46,20 +53,23 @@ export default function App() {
           </div>
 
           <Filtros
+            categorias={categorias}
             categoria={categoria}
             busca={busca}
             aoMudarCategoria={setCategoria}
             aoMudarBusca={setBusca}
           />
 
-          <div className="resultado">{produtosFiltrados.length} produto(s) encontrado(s)</div>
-          {produtosFiltrados.length > 0 ? (
+          {carregando && <p role="status">Carregando cardápio...</p>}
+          {erro && <p role="alert">Erro ao carregar: {erro}</p>}
+          {!carregando && !erro && <div className="resultado">{produtosFiltrados.length} produto(s) encontrado(s)</div>}
+          {!carregando && !erro && (produtosFiltrados.length > 0 ? (
             <div className="grade-produtos">
               {produtosFiltrados.map((produto) => <CardProduto key={produto.id} produto={produto} />)}
             </div>
           ) : (
             <div className="sem-resultados">Não encontramos esse doce. Experimente outra busca ou categoria.</div>
-          )}
+          ))}
         </section>
       </main>
 
