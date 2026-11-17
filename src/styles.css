@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap");
+
+:root {
+  font-family: "DM Sans", Arial, sans-serif;
+  color: #273947;
+  background: #f9f6f0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --azul: #3d6177;
+  --azul-escuro: #243e50;
+  --creme: #f9f6f0;
+  --borda: #e6ded2;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; text-decoration: none; }
+.topo { background: #e9f0f4; text-align: center; padding: 30px 20px 26px; }
+.topo-interno { max-width: 1100px; margin: auto; }
+.logo { display: block; width: 194px; height: 194px; object-fit: cover; border-radius: 50%; margin: 0 auto; box-shadow: 0 10px 25px #243e5017; }
+.topo-slogan { color: #506a79; font-size: 14px; letter-spacing: .02em; margin: 17px 0 22px; }
+.informacoes, .redes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.informacoes span { display: inline-flex; align-items: center; gap: 8px; padding: 10px 17px; border: 1px solid #cbd9e2; border-radius: 30px; background: #ffffffb8; font-size: 13px; }
+.redes { margin-top: 17px; }
+.redes a { display: inline-flex; gap: 7px; align-items: center; font-weight: 700; font-size: 14px; }
+.redes a:hover { color: #7895a7; }
+.faixa { background: var(--azul); color: #fff; }
+.faixa-interna { max-width: 1120px; padding: 16px 24px; margin: auto; display: flex; justify-content: space-between; align-items: center; gap: 14px; font-size: 14px; }
+.faixa span { display: inline-flex; align-items: center; gap: 10px; }
+.faixa strong { font-weight: 500; color: #f8e8d4; }
+.container { max-width: 1150px; margin: auto; padding: 0 24px 100px; }
+.apresentacao { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; padding: 65px 0 80px; }
+.sobretitulo { font-size: 12px; text-transform: uppercase; letter-spacing: .17em; color: #638196; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+.apresentacao h1, .titulo-secao h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; color: var(--azul-escuro); }
+.apresentacao h1 { font-size: clamp(36px, 4.5vw, 64px); line-height: 1.14; letter-spacing: -.035em; margin: 19px 0; }
+.apresentacao h1 em { color: #7897a8; font-weight: 400; }
+.apresentacao p { font-size: 16px; color: #657583; line-height: 1.8; max-width: 420px; }
+.botao-principal { display: inline-flex; gap: 30px; align-items: center; background: var(--azul); color: white; padding: 15px 24px; border-radius: 8px; font-weight: 700; margin-top: 18px; transition: background .2s; }
+.botao-principal:hover, .botao-pedir:hover { background: var(--azul-escuro); }
+.apresentacao-foto { height: 380px; border-radius: 160px 160px 16px 16px; overflow: hidden; position: relative; background: #e4d7c7; }
+.apresentacao-foto img { width: 100%; height: 100%; object-fit: cover; }
+.foto-selo { position: absolute; right: 22px; bottom: 22px; padding: 13px 18px; border-radius: 30px; background: #fffdf5e8; color: var(--azul); font-family: Georgia,serif; font-style: italic; }
+.cardapio { scroll-margin-top: 25px; }
+.titulo-secao { text-align: center; margin-bottom: 35px; }
+.titulo-secao h2 { font-size: clamp(34px, 4vw, 48px); margin: 8px 0 7px; }
+.titulo-secao p { color: #75828c; margin: 0; }
+.filtros { background: #fff; border: 1px solid var(--borda); padding: 19px; border-radius: 18px; margin-bottom: 20px; box-shadow: 0 6px 24px #263d4b08; }
+.categorias { display: flex; overflow-x: auto; gap: 9px; padding-bottom: 17px; }
+.categorias button { flex-shrink: 0; border: 1px solid #d9e3e9; border-radius: 30px; background: #fff; color: #536a7b; padding: 10px 19px; cursor: pointer; font-size: 13px; font-weight: 600; transition: .2s; }
+.categorias button:hover { border-color: var(--azul); }
+.categorias button.ativo { color: white; background: var(--azul); border-color: var(--azul); }
+.campo-busca { display: flex; align-items: center; gap: 12px; border: 1px solid #d8e2e9; padding: 0 17px; border-radius: 10px; color: #879aaa; }
+.campo-busca:focus-within { outline: 2px solid #a6bdcc; }
+.campo-busca input { border: 0; outline: 0; width: 100%; padding: 16px 0; color: #273947; background: transparent; font-size: 14px; }
+.resultado { font-size: 13px; color: #80919d; margin: 25px 0 18px; }
+.grade-produtos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.produto { min-width: 0; background: white; overflow: hidden; border: 1px solid #ebe4da; border-radius: 17px; box-shadow: 0 8px 26px #2739470a; transition: transform .2s; }
+.produto:hover { transform: translateY(-4px); }
+.produto-imagem { height: 215px; position: relative; background: #e9e2d9; }
+.produto-imagem img { width: 100%; height: 100%; object-fit: cover; }
+.etiqueta { position: absolute; left: 14px; top: 14px; color: #fff; background: #3d6177e8; border-radius: 30px; padding: 8px 12px; font-size: 11px; font-weight: 700; }
+.produto-conteudo { padding: 23px; }
+.produto-categoria { text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 700; color: #8299a6; }
+.produto h3 { font-family: "Playfair Display", Georgia, serif; font-size: 25px; font-weight: 500; margin: 9px 0; color: var(--azul-escuro); }
+.produto p { color: #78858d; font-size: 13px; line-height: 1.7; margin: 0; min-height: 65px; }
+.produto-rodape { border-top: 1px solid #f0eae4; margin-top: 20px; padding-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.produto-rodape strong { font-size: 18px; color: var(--azul-escuro); }
+.botao-pedir { display: inline-flex; align-items: center; gap: 7px; background: var(--azul); color: #fff; border-radius: 8px; padding: 10px 13px; font-size: 12px; font-weight: 700; }
+.botao-pedir.desativado { opacity: .65; cursor: not-allowed; }
+.sem-resultados { text-align: center; border: 1px dashed #bed0d9; border-radius: 15px; padding: 48px 20px; color: #6d8290; }
+.rodape { background: var(--azul-escuro); color: #f4ece0; text-align: center; padding: 42px 20px; }
+.rodape img { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; }
+.rodape p { font-family: Georgia, serif; font-size: 17px; }
+.rodape span { display: inline-flex; align-items: center; gap: 7px; opacity: .7; font-size: 12px; }
+@media (max-width: 850px) {
+  .apresentacao { gap: 25px; }
+  .grade-produtos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .topo { padding: 22px 14px; }
+  .logo { width: 150px; height: 150px; }
+  .faixa-interna { justify-content: center; text-align: center; }
+  .faixa strong { display: none; }
+  .container { padding: 0 17px 65px; }
+  .apresentacao { display: flex; flex-direction: column-reverse; padding: 30px 0 62px; align-items: stretch; gap: 27px; text-align: center; }
+  .apresentacao-foto { height: 220px; border-radius: 18px; }
+  .apresentacao h1 { font-size: 37px; }
+  .apresentacao p { margin-left: auto; margin-right: auto; font-size: 14px; }
+  .grade-produtos { grid-template-columns: 1fr; gap: 18px; }
+  .produto { display: grid; grid-template-columns: 38% 62%; }
+  .produto-imagem { height: 100%; min-height: 210px; }
+  .produto-conteudo { padding: 16px; }
+  .produto h3 { font-size: 21px; }
+  .produto p { font-size: 12px; min-height: auto; }
+  .produto-rodape { flex-wrap: wrap; padding-top: 12px; margin-top: 13px; }
+  .produto-rodape strong { font-size: 16px; }
+  .etiqueta { font-size: 9px; left: 8px; top: 9px; padding: 7px; }
+  .filtros { padding: 13px; }
+}
+@media (max-width: 380px) {
+  .produto { display: block; }
+  .produto-imagem { height: 210px; }
+}
