@@ -9,7 +9,7 @@ export function Cabecalho() {
           <img className="logo" src="/logo.jpg" alt="Lacakes Doceria" />
           <p className="topo-slogan">Doçuras feitas com carinho, para momentos especiais.</p>
 
-          {/* Localização em destaque, como na referência da Sweet Olivia. */}
+          {/* Localização em destaque*/}
           <div className="informacoes">
             <span><MapPin size={17} /> {loja.local}</span>
           </div>

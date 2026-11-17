@@ -4,5 +4,5 @@ export const loja = {
   nome: "Lacakes Doceria",
   instagram: "lacakkes",
   whatsapp: "5581000000000", // Fictício: links só funcionarão com um número real.
-  local: "Localização a confirmar", // Substitua pela cidade/UF real da doceria.
+  local: "Caetés 1, Abreu e Lima", // Substitua pela cidade/UF real da doceria.
 };
