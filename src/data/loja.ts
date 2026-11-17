@@ -1,8 +1,10 @@
-// Informações de contato usadas pelo cabeçalho e pelos botões de pedido.
-// Troque o WhatsApp FICTÍCIO pelo número real antes de publicar (55 + DDD + número).
+// Dados usados pelo cabeçalho e pelos pedidos.
 export const loja = {
   nome: "Lacakes Doceria",
   instagram: "lacakkes",
-  whatsapp: "5581000000000", // Fictício: links só funcionarão com um número real.
-  local: "Caetés 1, Abreu e Lima", // Substitua pela cidade/UF real da doceria.
+  whatsapp: "5581999689159", // 55 (Brasil) + 81 (DDD) + 999689159
+  local: "Rua 146, nº 26, Caetés I, Abreu e Lima - PE",
+  // O Google Maps faz a busca pelo endereço informado.
+  maps: "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent("Rua 146, número 26, Caetés 1, Abreu e Lima, Pernambuco, Brasil"),
 };

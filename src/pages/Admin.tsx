@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { ArrowLeft, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, ImagePlus, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { enviarImagem } from "../services/imagens";
 import { configurado, supabase } from "../lib/supabase";
 import { carregarCatalogo, excluirCategoria, excluirProduto, salvarCategoria, salvarProduto } from "../services/catalogo";
 import type { Categoria, Produto, ProdutoForm } from "../types/produto";
@@ -15,6 +16,8 @@ export function Admin() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [form, setForm] = useState<ProdutoForm>({ ...vazio });
+  // A foto fica no navegador até a administradora clicar em Salvar.
+  const [fotoSelecionada, setFotoSelecionada] = useState<File | null>(null);
   const [editando, setEditando] = useState<number | null>(null);
   const [nomeCategoria, setNomeCategoria] = useState("");
   const [categoriaEditando, setCategoriaEditando] = useState<number | null>(null);
@@ -101,7 +104,11 @@ export function Admin() {
         <form className="admin-form" onSubmit={e => {
           e.preventDefault();
           void executar(async () => {
-            await salvarProduto(form, editando ?? undefined);
+            // Primeiro envia a foto (se houver); depois salva a URL gerada no produto.
+            if (!fotoSelecionada && !form.imagem) throw new Error("Escolha uma foto para o produto.");
+            const imagem = fotoSelecionada ? await enviarImagem(fotoSelecionada) : form.imagem;
+            await salvarProduto({ ...form, imagem }, editando ?? undefined);
+            setFotoSelecionada(null);
             setEditando(null); setForm({ ...vazio });
           }, "Produto salvo com sucesso!");
         }}>
@@ -113,12 +120,26 @@ export function Admin() {
           <label>Preço (R$) — deixe em branco para "Sob consulta"
             <input type="number" min="0" step="0.01" value={form.preco ?? ""} onChange={e => setForm({ ...form, preco: e.target.value === "" ? null : Number(e.target.value) })} />
           </label>
-          <label>URL da imagem<input type="url" required placeholder="https://..." value={form.imagem} onChange={e => setForm({ ...form, imagem: e.target.value })} /></label>
+          <div className="admin-foto admin-largo">
+            <strong>Foto do produto</strong>
+            <p>Escolha uma foto da galeria ou use a câmera do celular (JPG, PNG ou WEBP, até 5 MB).</p>
+            <div className="admin-foto-botoes">
+              <label className="admin-botao-foto"><ImagePlus size={18} /> Escolher foto
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFotoSelecionada(e.target.files?.[0] ?? null)} />
+              </label>
+              <label className="admin-botao-foto"><Camera size={18} /> Tirar foto
+                <input type="file" accept="image/*" capture="environment" onChange={e => setFotoSelecionada(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
+            {fotoSelecionada ? <span role="status">Foto selecionada: {fotoSelecionada.name}</span>
+              : form.imagem ? <img className="admin-foto-preview" src={form.imagem} alt="Imagem atual do produto" />
+              : <small>Nenhuma foto selecionada.</small>}
+          </div>
           <label className="admin-largo">Descrição<textarea rows={3} maxLength={500} value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} /></label>
           <label className="admin-check"><input type="checkbox" checked={Boolean(form.destaque)} onChange={e => setForm({ ...form, destaque: e.target.checked })} /> Marcar como destaque</label>
           <div className="admin-acoes">
             <button type="submit" disabled={ocupado || categorias.length === 0}><Plus size={16} /> {editando ? "Salvar alterações" : "Cadastrar produto"}</button>
-            {editando && <button className="botao-secundario" type="button" onClick={() => { setEditando(null); setForm({ ...vazio }); }}>Cancelar</button>}
+            {editando && <button className="botao-secundario" type="button" onClick={() => { setEditando(null); setForm({ ...vazio }); setFotoSelecionada(null); }}>Cancelar</button>}
           </div>
         </form>
 
@@ -129,6 +150,7 @@ export function Admin() {
             <div className="admin-acoes">
               <button type="button" className="botao-secundario" onClick={() => {
                 setEditando(p.id);
+                setFotoSelecionada(null);
                 setForm({ nome: p.nome, descricao: p.descricao, preco: p.preco, imagem: p.imagem, categoriaId: p.categoriaId, destaque: Boolean(p.destaque) });
               }}><Pencil size={16} /> Editar</button>
               <button type="button" className="botao-perigo" disabled={ocupado} onClick={() => {

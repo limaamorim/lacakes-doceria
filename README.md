@@ -28,9 +28,10 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_sua_chave
 - Loja: listagem, busca e filtro por categorias.
 - Admin: login, cadastro, edição e exclusão de produtos.
 - Admin: criar, renomear e excluir categorias.
-- Fotos: neste primeiro momento basta **colar a URL pública de uma imagem** no formulário; ainda não existe upload de arquivos.
+- Fotos: no admin, **Escolher foto** ou **Tirar foto** no celular. Arquivos JPG, PNG ou WEBP até 5 MB vão para o Supabase Storage.
 - A exclusão de categoria com produtos vinculados é bloqueada no banco.
-- O WhatsApp é configurado separadamente em `src/data/loja.ts`; o número atual é fictício.
+- O WhatsApp configurado é **(81) 99968-9159** e o link inclui uma mensagem pronta com o produto.
+- O endereço do cabeçalho abre uma busca no Google Maps: Rua 146, nº 26, Caetés 1, Abreu e Lima - PE.
 
 ## Estrutura
 
@@ -41,14 +42,14 @@ src/
   hooks/        useCatalogo — busca e atualização do catálogo
   lib/          supabase.ts — cliente Supabase
   pages/        Admin.tsx — formulário e gerenciamento
-  services/     catalogo.ts — operações no banco
+  services/     catalogo.ts — operações no banco; imagens.ts — upload de fotos
   types/        produto.ts — tipos TypeScript
   utils/        Formatação de preço e link WhatsApp
   App.tsx       Página pública ou admin
   styles.css    Layout e responsividade
 supabase/
   schema.sql    Duas tabelas e regras RLS
-  exemplos.sql  Categorias iniciais (opcional)
+  exemplos.sql  Categorias iniciais (opcional)\n  storage.sql   Bucket de fotos e política de upload seguro
 ```
 
 ## Entendendo o fluxo
@@ -65,3 +66,16 @@ supabase/
 Nunca coloque chaves secretas nem senha no GitHub. O navegador usa somente a chave pública e as políticas RLS impedem alterações de usuários não autorizados. Mantenha `.env.local` fora do Git.
 
 O usuário do Auth não é uma terceira tabela do catálogo: a infraestrutura de login é gerenciada pelo Supabase.
+
+## Habilitar envio de fotos — etapa obrigatória
+
+1. Abra `supabase/storage.sql` e copie seu conteúdo para **SQL Editor** no Supabase.
+2. Execute o script uma única vez. Ele cria o bucket público `produtos` com imagens limitadas a 5 MB e libera **upload somente ao administrador** definido em `public.lacakes_admin()`.
+3. Faça login em `/admin`, selecione **Escolher foto** ou **Tirar foto** no celular e salve o produto.
+4. O serviço `src/services/imagens.ts` envia o arquivo ao Storage e recebe a URL pública. A tabela `produtos` guarda essa URL na coluna `imagem`. Não precisa alterar tabelas existentes.
+
+**Observações:** Câmera depende do aparelho, navegador e suas permissões. Em computador o controle pode abrir o seletor de arquivos. Algumas fotos HEIC do iPhone não são aceitas: use JPG/PNG/WEBP. Quando uma foto é substituída ou um produto é excluído, o arquivo anterior não é apagado automaticamente do Storage. Uma falha ao salvar o registro após o upload também pode deixar uma foto não utilizada; esses arquivos podem ser removidos manualmente pelo painel Storage.
+
+## Alterações de contato
+
+O endereço e o telefone estão em `src/data/loja.ts`. O endereço abre **Google Maps** usando busca textual (confirme o marcador retornado pelo Maps antes de compartilhar com clientes). O cabeçalho abre WhatsApp com mensagem genérica e cada produto abre uma mensagem específica.

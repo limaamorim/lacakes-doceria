@@ -1,5 +1,6 @@
 import { Instagram, MapPin, MessageCircle, ShoppingBag } from "lucide-react";
 import { loja } from "../data/loja";
+import { criarLinkContato } from "../utils/whatsapp";
 
 export function Cabecalho() {
   return (
@@ -11,7 +12,7 @@ export function Cabecalho() {
 
           {/* Localização em destaque*/}
           <div className="informacoes">
-            <span><MapPin size={17} /> {loja.local}</span>
+            <a className="local-link" href={loja.maps} target="_blank" rel="noopener noreferrer" aria-label={"Ver localização no Google Maps: " + loja.local}><MapPin size={17} /> {loja.local}</a>
           </div>
 
           {/* Links externos: os dados são configurados no arquivo data/loja.ts. */}
@@ -19,7 +20,7 @@ export function Cabecalho() {
             <a href={"https://www.instagram.com/" + loja.instagram + "/"} target="_blank" rel="noopener noreferrer">
               <Instagram size={20} /> @{loja.instagram}
             </a>
-            <a href={"https://wa.me/" + loja.whatsapp} target="_blank" rel="noopener noreferrer">
+            <a href={criarLinkContato(loja.whatsapp)} target="_blank" rel="noopener noreferrer">
               <MessageCircle size={20} /> WhatsApp
             </a>
           </div>
