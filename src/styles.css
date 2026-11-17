@@ -104,3 +104,13 @@ a { color: inherit; text-decoration: none; }
   .produto { display: block; }
   .produto-imagem { height: 210px; }
 }
+
+/* Links sociais destacados, inspirados no cabeçalho da Sweet Olivia. */
+.redes { margin-top: 16px; gap: 24px; }
+.redes a { color: var(--azul-escuro); transition: color .2s; }
+.redes a:last-child { color: #218e61; }
+.redes a:hover { color: #7895a7; }
+@media (max-width: 620px) {
+  .redes { gap: 18px; }
+  .redes a { font-size: 13px; }
+}
