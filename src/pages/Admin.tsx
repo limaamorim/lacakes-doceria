@@ -47,7 +47,12 @@ export function Admin() {
       await recarregar();
       setMensagem(sucesso);
     } catch (e) {
-      setMensagem("Erro: " + (e instanceof Error ? e.message : "Não foi possível salvar."));
+      // O Supabase devolve erros como objetos (PostgrestError), nem sempre Error do JavaScript.
+      // Exibir a propriedade message ajuda a identificar RLS, permissões ou campos inválidos.
+      const motivo = e && typeof e === "object" && "message" in e && typeof e.message === "string"
+        ? e.message
+        : "Não foi possível concluir a operação.";
+      setMensagem("Erro ao salvar: " + motivo);
     } finally { setOcupado(false); }
   }
 
