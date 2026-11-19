@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { ArrowLeft, Camera, ImagePlus, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
 import { enviarImagem } from "../services/imagens";
+import { carregarConfiguracaoSite, configuracaoPadrao, salvarConfiguracaoSite } from "../services/configuracaoSite";
+import type { ConfiguracaoSite } from "../services/configuracaoSite";
 import { configurado, supabase } from "../lib/supabase";
 import { carregarCatalogo, excluirCategoria, excluirProduto, salvarCategoria, salvarProduto } from "../services/catalogo";
 import type { Categoria, Produto, ProdutoForm } from "../types/produto";
@@ -23,6 +25,9 @@ export function Admin() {
   const [categoriaEditando, setCategoriaEditando] = useState<number | null>(null);
   const [mensagem, setMensagem] = useState("");
   const [ocupado, setOcupado] = useState(false);
+  const [configuracao, setConfiguracao] = useState<ConfiguracaoSite>(configuracaoPadrao);
+  const [fotoCapa, setFotoCapa] = useState<File | null>(null);
+  const [configuracaoCarregada, setConfiguracaoCarregada] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -41,6 +46,9 @@ export function Admin() {
   useEffect(() => {
     if (!sessao) return;
     void recarregar().catch(e => setMensagem(String(e.message ?? e)));
+    void carregarConfiguracaoSite()
+      .then(dados => { setConfiguracao(dados); setConfiguracaoCarregada(true); })
+      .catch(e => setMensagem("Erro ao carregar a personalização. Execute supabase/personalizacao.sql: " + String(e.message ?? e)));
   }, [sessao]);
 
   async function executar(acao: () => Promise<void>, sucesso: string) {
@@ -96,8 +104,56 @@ export function Admin() {
           <LogOut size={16} /> Sair
         </button>
       </div>
-      <p>Edite os produtos e categorias aqui. As alterações são salvas no Supabase.</p>
+      <p>Personalize a página inicial, os produtos e as categorias. As alterações são salvas no Supabase.</p>
       {mensagem && <p role="status" className="admin-mensagem">{mensagem}</p>}
+
+      <section className="admin-secao">
+        <h2>Personalizar página inicial</h2>
+        <p>Altere os textos e a foto principal. O visual do site será mantido.</p>
+        <form className="admin-form" onSubmit={e => {
+          e.preventDefault();
+          void executar(async () => {
+            const imagem = fotoCapa ? await enviarImagem(fotoCapa) : configuracao.imagem_principal;
+            const dados = { ...configuracao, imagem_principal: imagem };
+            await salvarConfiguracaoSite(dados);
+            setConfiguracao(dados);
+            setFotoCapa(null);
+          }, "Página inicial atualizada com sucesso!");
+        }}>
+          <label>Título principal
+            <input required maxLength={120} value={configuracao.titulo_principal}
+              onChange={e => setConfiguracao({ ...configuracao, titulo_principal: e.target.value })} />
+          </label>
+          <label>Texto em destaque (itálico)
+            <input required maxLength={120} value={configuracao.titulo_destaque}
+              onChange={e => setConfiguracao({ ...configuracao, titulo_destaque: e.target.value })} />
+          </label>
+          <label className="admin-largo">Descrição abaixo do título
+            <textarea required rows={3} maxLength={400} value={configuracao.descricao_principal}
+              onChange={e => setConfiguracao({ ...configuracao, descricao_principal: e.target.value })} />
+          </label>
+          <label className="admin-largo">Texto abaixo de "Nosso cardápio"
+            <textarea required rows={2} maxLength={250} value={configuracao.descricao_cardapio}
+              onChange={e => setConfiguracao({ ...configuracao, descricao_cardapio: e.target.value })} />
+          </label>
+          <div className="admin-foto admin-largo">
+            <strong>Foto principal do bolo</strong>
+            <p>Escolha uma imagem JPG, PNG ou WEBP (até 5 MB). O enquadramento se adapta ao espaço do site.</p>
+            <div className="admin-foto-botoes">
+              <label className="admin-botao-foto"><ImagePlus size={18} /> Escolher imagem
+                <input type="file" accept="image/jpeg,image/png,image/webp"
+                  onChange={e => setFotoCapa(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
+            {fotoCapa
+              ? <><span>Nova foto: {fotoCapa.name}</span><img className="admin-foto-preview" src={URL.createObjectURL(fotoCapa)} alt="Prévia da nova imagem" onLoad={e => URL.revokeObjectURL(e.currentTarget.src)} /></>
+              : <img className="admin-foto-preview" src={configuracao.imagem_principal} alt="Imagem principal atual" />}
+          </div>
+          <div className="admin-acoes admin-largo">
+            <button type="submit" disabled={ocupado || !configuracaoCarregada}>Salvar personalização</button>
+          </div>
+        </form>
+      </section>
 
       <section className="admin-secao">
         <h2>{editando ? "Editar produto" : "Novo produto"}</h2>
